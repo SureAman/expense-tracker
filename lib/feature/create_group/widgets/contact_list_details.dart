@@ -1,7 +1,9 @@
+import 'package:expense_tracker/feature/create_group/bloc/bloc/create_group_bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 
-class ContactListDetails extends StatefulWidget {
+class ContactListDetails extends StatelessWidget {
   final Contact contact;
   final int index;
 
@@ -12,43 +14,36 @@ class ContactListDetails extends StatefulWidget {
   });
 
   @override
-  State<ContactListDetails> createState() => _ContactListDetailsState();
-}
-
-class _ContactListDetailsState extends State<ContactListDetails> {
-  Set<int> selectedIndices = <int>{};
-
-  @override
   Widget build(BuildContext context) {
     return ListTile(
-      title: Text(widget.contact.displayName),
+      title: Text(contact.displayName),
       subtitle: ListView.builder(
-        key: ValueKey(widget.contact.id),
+        key: ValueKey(contact.id),
         physics: const NeverScrollableScrollPhysics(),
         shrinkWrap: true,
-        itemCount: widget.contact.phones.length,
+        itemCount: contact.phones.length,
         itemBuilder: (_, index) {
-          return _number(widget.contact.phones[index]);
+          return _number(contact.phones[index]);
         },
       ),
-      trailing: Checkbox(
-        key: ValueKey(widget.contact.id),
-        value: selectedIndices.contains(widget.index),
-        onChanged: (value) {
-          _onCheckboxChanged(value, widget.index);
+      trailing: BlocBuilder<CreateGroupBloc, CreateGroupState>(
+        builder: (context, state) {
+          return Checkbox(
+            key: ValueKey(contact.id),
+            value: state.selectedIndices.contains(index),
+            onChanged: (value) {
+              _onCheckboxChanged(value, index, context);
+            },
+          );
         },
       ),
     );
   }
 
-  void _onCheckboxChanged(bool? value, int index) {
-    setState(() {
-      if (value == true) {
-        selectedIndices.add(index); // Add index to set when selected
-      } else {
-        selectedIndices.remove(index); // Remove index from set when deselected
-      }
-    });
+  void _onCheckboxChanged(bool? value, int index, BuildContext context) {
+    context.read<CreateGroupBloc>().add(
+      SelectedContactEvent(index: index, value: value),
+    );
   }
 
   Widget _number(Phone phone) {

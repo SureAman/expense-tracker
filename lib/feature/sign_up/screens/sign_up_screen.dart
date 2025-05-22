@@ -1,11 +1,17 @@
 import 'package:expense_tracker/core/constants/icons.dart';
 import 'package:expense_tracker/core/constants/names.dart';
+import 'package:expense_tracker/core/route/app_routes.dart';
+import 'package:expense_tracker/core/route/route_names.dart';
 import 'package:expense_tracker/core/styles/text_styles.dart';
+import 'package:expense_tracker/core/utils/validation_utils.dart';
 import 'package:expense_tracker/core/widgets/common_app_bar.dart';
 import 'package:expense_tracker/core/widgets/common_elevated_button.dart';
 import 'package:expense_tracker/core/widgets/common_text_form_field.dart';
-import 'package:expense_tracker/feature/home/screen/home_screen.dart';
+import 'package:expense_tracker/feature/sign_up/bloc/signup_bloc.dart';
+import 'package:expense_tracker/feature/sign_up/bloc/signup_event.dart';
+import 'package:expense_tracker/feature/sign_up/bloc/signup_state.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -14,14 +20,14 @@ class SignUpScreen extends StatefulWidget {
   State<SignUpScreen> createState() => _SignUpScreenState();
 }
 
-class _SignUpScreenState extends State<SignUpScreen> {
+class _SignUpScreenState extends State<SignUpScreen> with ValidationUtils {
   final GlobalKey<FormState> _state = GlobalKey<FormState>();
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _numberController = TextEditingController();
 
   @override
   void dispose() {
-    _state.currentState!.dispose();
+    _state.currentState?.dispose();
     _nameController.dispose();
     _numberController.dispose();
     super.dispose();
@@ -41,8 +47,29 @@ class _SignUpScreenState extends State<SignUpScreen> {
         width: double.infinity,
         height: double.infinity,
         padding: const EdgeInsets.symmetric(horizontal: 24),
-        child: _buildForm(),
+        child: Stack(
+          children: [
+            _buildForm(),
+            _circularProgressIndicator(),
+            _navigateToNewScreen(),
+          ],
+        ),
       ),
+    );
+  }
+
+  BlocListener<SignupBloc, SignupState> _navigateToNewScreen() {
+    return BlocListener<SignupBloc, SignupState>(
+      listenWhen:
+          (previous, current) =>
+              previous.isSubmittedSuccessfully !=
+              current.isSubmittedSuccessfully,
+      listener: (context, state) {
+        if (state.isSubmittedSuccessfully) {
+          Navigator.pushReplacementNamed(context, RouteNames.home);
+        }
+      },
+      child: const SizedBox.shrink(),
     );
   }
 
@@ -72,7 +99,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     );
   }
 
-  _topTexts() {
+  Widget _topTexts() {
     return Column(
       children: [
         Text(
@@ -88,22 +115,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
     );
   }
 
-  _textFields() {
+  Widget _textFields() {
     return Column(
       children: [
         CommonTextFormField(
           controller: _nameController,
           labelText: NameConstants.enterName,
-          validator: (value) {
-            if (value != null) {
-              if (value.trim().isEmpty) {
-                return NameConstants.pleaseEnterValidName;
-              }
-              return null;
-            } else {
-              return NameConstants.nameCannotBeEmpty;
-            }
-          },
+          validator: validateName,
         ),
         const SizedBox(height: 12),
         CommonTextFormField(
@@ -111,32 +129,37 @@ class _SignUpScreenState extends State<SignUpScreen> {
           labelText: NameConstants.enterPhone,
           icon: IconConstants.phoneIcon,
           type: TextInputType.phone,
-          validator: (value) {
-            if (value != null) {
-              if (value.length != 10) {
-                return NameConstants.enterValidNumber;
-              }
-            } else {
-              return NameConstants.numberCannotBeEmpty;
-            }
-            return null;
-          },
+          validator: validateNumber,
         ),
         const SizedBox(height: 16),
         CommonElevatedButton(
           buttonText: NameConstants.saveDetails,
           onPressed: () {
             if (_state.currentState!.validate()) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const HomeScreen()),
+              context.read<SignupBloc>().add(
+                FormSubmitted(
+                  name: _nameController.text,
+                  number: _numberController.text,
+                ),
               );
+              print("Called");
             } else {
               print("Error");
             }
           },
         ),
       ],
+    );
+  }
+
+  Widget _circularProgressIndicator() {
+    return BlocBuilder<SignupBloc, SignupState>(
+      //buildWhen: (previous, current) => previous.isLoading != current.isLoading,
+      builder: (context, state) {
+        return state.isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : const SizedBox.shrink();
+      },
     );
   }
 }

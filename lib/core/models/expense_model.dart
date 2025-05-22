@@ -2,7 +2,7 @@ class ExpenseModel {
   final String expenseName;
   final String id;
   final double expenseAmount;
-  final int groupId; // NEW FIELD
+  final String groupId;
 
   ExpenseModel({
     required this.expenseName,

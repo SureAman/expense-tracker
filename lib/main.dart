@@ -1,4 +1,5 @@
-import 'package:expense_tracker/feature/expense_details/screen/expense_details_screen.dart';
+import 'package:expense_tracker/core/route/app_routes.dart';
+import 'package:expense_tracker/core/route/route_names.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -14,10 +15,11 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
+      initialRoute: RouteNames.signup,
+      onGenerateRoute: AppRoutes.onGenerateRoute,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: const ExpenseDetailsScreen(),
     );
   }
 }

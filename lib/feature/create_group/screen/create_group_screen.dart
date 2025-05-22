@@ -2,11 +2,11 @@ import 'package:expense_tracker/core/constants/icons.dart';
 import 'package:expense_tracker/core/constants/names.dart';
 import 'package:expense_tracker/core/widgets/common_app_bar.dart';
 import 'package:expense_tracker/core/widgets/common_elevated_button.dart';
-import 'package:expense_tracker/core/widgets/common_scaffold_messanger.dart';
 import 'package:expense_tracker/core/widgets/common_text_form_field.dart';
+import 'package:expense_tracker/feature/create_group/bloc/bloc/create_group_bloc.dart';
 import 'package:expense_tracker/feature/create_group/widgets/contact_list_details.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_contacts/flutter_contacts.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class CreateGroupScreen extends StatefulWidget {
   const CreateGroupScreen({super.key});
@@ -18,32 +18,19 @@ class CreateGroupScreen extends StatefulWidget {
 class _CreateGroupScreenState extends State<CreateGroupScreen> {
   final TextEditingController _groupNameCotroller = TextEditingController();
   final GlobalKey<FormState> _state = GlobalKey();
-  Set<int> selectedIndices = <int>{};
-
-  List<Contact>? _contacts;
-  bool _permissionDenied = false;
 
   @override
   void initState() {
-    _fetchContacts();
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      context.read<CreateGroupBloc>().add(FetchContactEvent());
+    });
     super.initState();
-  }
-
-  Future _fetchContacts() async {
-    if (!await FlutterContacts.requestPermission(readonly: true)) {
-      setState(() => _permissionDenied = true);
-    } else {
-      final contacts = await FlutterContacts.getContacts(withProperties: true);
-      setState(() => _contacts = contacts);
-    }
   }
 
   @override
   void dispose() {
     _groupNameCotroller.dispose();
     _state.currentState?.dispose();
-    selectedIndices = {};
-    _permissionDenied = false;
     super.dispose();
   }
 
@@ -52,25 +39,58 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       resizeToAvoidBottomInset: true,
-      appBar: const CommonAppBar(
-        name: NameConstants.createGroup,
-        isCenterTitle: true,
-        backArrow: true,
-        isBold: true,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _groupTextField(),
-            const Divider(),
-            Expanded(child: _contactList()),
-            const Divider(),
-            _createGroupButton(),
-          ],
-        ),
+      appBar: _appBar(),
+      body: _blocConsumer(),
+    );
+  }
+
+  CommonAppBar _appBar() {
+    return const CommonAppBar(
+      name: NameConstants.createGroup,
+      isCenterTitle: true,
+      backArrow: true,
+      isBold: true,
+    );
+  }
+
+  BlocConsumer<CreateGroupBloc, CreateGroupState> _blocConsumer() {
+    return BlocConsumer<CreateGroupBloc, CreateGroupState>(
+      buildWhen:
+          (previous, current) =>
+              current.status == CreateGroupStatus.loading ||
+              current.status == CreateGroupStatus.loaded,
+      builder: (context, state) {
+        if (state.status == CreateGroupStatus.loading) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        return _buildUi();
+      },
+      listenWhen: (previous, current) => previous.status != current.status,
+      listener: (_, state) {
+        if (state.status == CreateGroupStatus.error) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text(NameConstants.pleaseSelectContact)),
+          );
+        } else if (state.status == CreateGroupStatus.loaded) {
+          Navigator.pop(context, true);
+        }
+      },
+    );
+  }
+
+  Padding _buildUi() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _groupTextField(),
+          const Divider(),
+          Expanded(child: _contactList()),
+          const Divider(),
+          _createGroupButton(),
+        ],
       ),
     );
   }
@@ -107,12 +127,9 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
           icon: IconConstants.addIcon,
           onPressed: () {
             if (_state.currentState!.validate()) {
-              if (selectedIndices.isEmpty) {
-                const CommonScaffoldMessenger(
-                  errorType: ErrorType.error,
-                  message: NameConstants.pleaseSelectContact,
-                );
-              }
+              context.read<CreateGroupBloc>().add(
+                CreateNewGroupEvent(groupName: _groupNameCotroller.text),
+              );
             } else {}
           },
         ),
@@ -121,18 +138,22 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
   }
 
   Widget _contactList() {
-    if (_permissionDenied) {
-      return const Center(child: Text(NameConstants.permissionDenied));
-    }
-    if (_contacts == null) {
-      return const Center(child: CircularProgressIndicator());
-    }
-    return ListView.builder(
-      key: UniqueKey(),
-      itemCount: _contacts!.length,
-      itemBuilder: (_, index) {
-        final eachContact = _contacts![index];
-        return ContactListDetails(contact: eachContact, index: index);
+    return BlocBuilder<CreateGroupBloc, CreateGroupState>(
+      builder: (context, state) {
+        if (state.isPermissionDenied) {
+          return const Center(child: Text(NameConstants.permissionDenied));
+        } else if (state.contacts.isEmpty) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (state.contacts.isNotEmpty) {
+          return ListView.builder(
+            itemCount: state.contacts.length,
+            itemBuilder: (_, index) {
+              final eachContact = state.contacts[index];
+              return ContactListDetails(contact: eachContact, index: index);
+            },
+          );
+        }
+        return const SizedBox();
       },
     );
   }
