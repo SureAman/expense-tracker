@@ -1,7 +1,10 @@
+import 'package:expense_tracker/core/models/expense_model.dart';
 import 'package:expense_tracker/core/route/route_names.dart';
+import 'package:expense_tracker/feature/add_expense/bloc/add_expense_bloc.dart';
 import 'package:expense_tracker/feature/add_expense/screen/add_expense_screen.dart';
 import 'package:expense_tracker/feature/create_group/bloc/bloc/create_group_bloc.dart';
 import 'package:expense_tracker/feature/create_group/screen/create_group_screen.dart';
+import 'package:expense_tracker/feature/expense_breakup/screen/expense_breakup_screen.dart';
 import 'package:expense_tracker/feature/expense_details/bloc/expense_details_bloc.dart';
 import 'package:expense_tracker/feature/expense_details/screen/expense_details_screen.dart';
 import 'package:expense_tracker/feature/home/bloc/home_bloc.dart';
@@ -43,7 +46,14 @@ class AppRoutes {
               ),
         );
       case RouteNames.addexpense:
-        return MaterialPageRoute(builder: (_) => const AddExpenseScreen());
+        final args = settings.arguments as Map<String, String>;
+        return MaterialPageRoute(
+          builder:
+              (_) => BlocProvider(
+                create: (context) => AddExpenseBloc(),
+                child: AddExpenseScreen(groupId: args['groupId'] as String),
+              ),
+        );
       case RouteNames.creategroup:
         //final args = settings.arguments as HomeBloc;
         return MaterialPageRoute(
@@ -52,6 +62,11 @@ class AppRoutes {
                 create: (context) => CreateGroupBloc(),
                 child: const CreateGroupScreen(),
               ),
+        );
+      case RouteNames.expenseBreakup:
+        final args = settings.arguments as ExpenseModel;
+        return MaterialPageRoute(
+          builder: (_) => ExpenseBreakupScreen(model: args),
         );
       default:
         return MaterialPageRoute(

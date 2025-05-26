@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:equatable/equatable.dart';
 import 'package:expense_tracker/core/database/shared_preferences_manager.dart';
+import 'package:expense_tracker/core/models/contacts_model.dart';
 import 'package:expense_tracker/core/models/expense_model.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -27,13 +28,11 @@ class ExpenseDetailsBloc
             .where((eachExpense) => eachExpense.groupId == event.groupId)
             .toList();
 
-    await Future.delayed(const Duration(seconds: 2), () {
-      emit(
-        state.copyWith(
-          status: ExpenseDetailsStatus.loaded,
-          model: refinedExpenseModel,
-        ),
-      );
-    });
+    emit(
+      state.copyWith(
+        status: ExpenseDetailsStatus.loaded,
+        model: refinedExpenseModel,
+      ),
+    );
   }
 }

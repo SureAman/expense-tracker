@@ -4,6 +4,7 @@ import 'package:expense_tracker/core/constants/names.dart';
 import 'package:expense_tracker/core/database/shared_preferences_manager.dart';
 import 'package:expense_tracker/core/models/contacts_model.dart';
 import 'package:expense_tracker/core/models/group_model.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 
 part 'create_group_event.dart';
@@ -24,27 +25,26 @@ class CreateGroupBloc extends Bloc<CreateGroupEvent, CreateGroupState> {
 
       List<ContactsModel> models = [];
 
+      String id = "${event.groupName} ${UniqueKey()}}";
       for (var index in state.selectedIndices) {
         Contact contact = state.contacts.elementAt(index);
         models.add(
           ContactsModel(
-            contactName: contact.name.toString(),
+            contactName: contact.displayName.toString(),
             contactNumber:
                 contact.phones.map((number) => number.number).toList(),
             contactId: "${contact.name}",
+            groupId: id,
           ),
         );
       }
+      final memberCount = models.length;
 
       print("models $models");
+      print("Member Count : ${memberCount + 1}");
 
-      final memberCount = models.length;
       SharedPreferencesManager.addGroup(
-        GroupModel(
-          id: "${event.groupName} $memberCount",
-          name: event.groupName,
-          members: memberCount + 1,
-        ),
+        GroupModel(id: id, name: event.groupName, members: memberCount + 1),
       );
       SharedPreferencesManager.addContacts(models);
 

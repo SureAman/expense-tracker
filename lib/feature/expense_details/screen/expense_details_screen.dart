@@ -13,6 +13,7 @@ class ExpenseDetailsScreen extends StatelessWidget {
   const ExpenseDetailsScreen({super.key, required this.groupId});
   final String groupId;
 
+  //Build Function
   @override
   Widget build(BuildContext context) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -29,16 +30,29 @@ class ExpenseDetailsScreen extends StatelessWidget {
     );
   }
 
+  //Button to add expense
   CommonElevatedButton _elevatedButton(BuildContext context) {
     return CommonElevatedButton(
       buttonText: NameConstants.addExpense,
-      onPressed: () {
-        Navigator.pushNamed(context, RouteNames.addexpense);
+      onPressed: () async {
+        final value =
+            await Navigator.pushNamed(
+              context,
+              RouteNames.addexpense,
+              arguments: {"groupId": groupId},
+            ) ??
+            false;
+        if (value as bool) {
+          context.read<ExpenseDetailsBloc>().add(
+            FetchInitialExpenseEvent(groupId: groupId),
+          );
+        }
       },
       icon: IconConstants.addIcon,
     );
   }
 
+  //Scaffold Body
   Padding _buildBody() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -50,6 +64,7 @@ class ExpenseDetailsScreen extends StatelessWidget {
     );
   }
 
+  //App Bar
   CommonAppBar _appBar() {
     return const CommonAppBar(
       name: NameConstants.expenseDetails,
@@ -59,16 +74,16 @@ class ExpenseDetailsScreen extends StatelessWidget {
     );
   }
 
+  //Builder for expense list
   BlocBuilder<ExpenseDetailsBloc, ExpenseDetailsState> _blocBuilder() {
     //final expenseList = generateDummyExpenses();
     return BlocBuilder<ExpenseDetailsBloc, ExpenseDetailsState>(
       builder: (context, state) {
         if (state.status == ExpenseDetailsStatus.loading) {
-          print("ExpenseLoading");
           return const Center(child: CircularProgressIndicator());
         } else if (state.status == ExpenseDetailsStatus.loaded) {
-          print("ExpenseLoaded");
           final expenseListModel = state.model;
+          print(expenseListModel);
           if (expenseListModel.isEmpty) {
             return Center(
               child: Text(
@@ -77,7 +92,7 @@ class ExpenseDetailsScreen extends StatelessWidget {
               ),
             );
           } else {
-            return _expenseList(expenseListModel);
+            return _expenseList(expenseListModel, context);
           }
         }
         return const SizedBox();
@@ -85,17 +100,23 @@ class ExpenseDetailsScreen extends StatelessWidget {
     );
   }
 
-  ListView _expenseList(List<ExpenseModel> expenseListModel) {
+  //Expense List
+  ListView _expenseList(
+    List<ExpenseModel> expenseListModel,
+    BuildContext context,
+  ) {
     return ListView.builder(
       itemCount: expenseListModel.length,
       itemBuilder: (_, index) {
         final eachExpense = expenseListModel[index];
-        return _eachExpenseDetails(eachExpense);
+        print(eachExpense.expenseName);
+        return _eachExpenseDetails(eachExpense, context);
       },
     );
   }
 
-  Widget _eachExpenseDetails(ExpenseModel eachExpense) {
+  //Each Expense Ui
+  Widget _eachExpenseDetails(ExpenseModel eachExpense, BuildContext context) {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 6),
       decoration: BoxDecoration(
@@ -104,7 +125,13 @@ class ExpenseDetailsScreen extends StatelessWidget {
       ),
       child: InkWell(
         borderRadius: BorderRadius.circular(8),
-        onTap: () {},
+        onTap: () {
+          Navigator.pushNamed(
+            context,
+            RouteNames.expenseBreakup,
+            arguments: eachExpense,
+          );
+        },
         child: ListTile(
           title: Text(
             eachExpense.expenseName,
