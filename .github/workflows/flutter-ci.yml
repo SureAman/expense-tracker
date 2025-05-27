@@ -2,37 +2,37 @@ name: Flutter CI/CD
 
 on:
   push:
-    branches: [ "main" ] # Trigger only on pushes to main
+    branches: [ "main" ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      # Set up Flutter
-      - uses: subosito/flutter-action@v2
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.19.6' # or a specific version like '3.19.0'
+          flutter-version: '3.19.6'
+          channel: 'stable'
 
-      # Get project dependencies
+      - name: Check Flutter version
+        run: flutter --version
+
       - name: Install dependencies
         run: flutter pub get
 
-      # Analyze Dart code
       - name: Analyze code
         run: flutter analyze
 
-      # Run tests (optional but recommended)
       - name: Run tests
         run: flutter test
 
-      # Build release APK
       - name: Build release APK
         run: flutter build apk --release
 
-      # Optional: Upload the APK as an artifact
       - name: Upload release APK
         uses: actions/upload-artifact@v4
         with:
