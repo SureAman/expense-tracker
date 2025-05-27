@@ -15,7 +15,7 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.19.6'
+          flutter-version: '3.29.3'
           channel: 'stable'
       - name: Override PATH to use Dart from Flutter
         run: echo "$FLUTTER_ROOT/bin/cache/dart-sdk/bin" >> $GITHUB_PATH
