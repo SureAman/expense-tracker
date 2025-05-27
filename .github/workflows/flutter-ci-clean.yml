@@ -17,9 +17,13 @@ jobs:
         with:
           flutter-version: '3.19.6'
           channel: 'stable'
+      - name: Override PATH to use Dart from Flutter
+        run: echo "$FLUTTER_ROOT/bin/cache/dart-sdk/bin" >> $GITHUB_PATH
 
-      - name: Check Flutter version
-        run: flutter --version
+      - name: Check versions
+        run: |
+          flutter --version
+          dart --version
 
       - name: Install dependencies
         run: flutter pub get
