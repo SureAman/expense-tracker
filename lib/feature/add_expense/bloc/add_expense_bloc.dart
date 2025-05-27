@@ -46,9 +46,6 @@ class AddExpenseBloc extends Bloc<AddExpenseInitialEvent, AddExpenseState> {
   ) async {
     emit(state.copyWith(contactStatus: FetchContactsStatus.loading));
     final contacts = await addExpenseRepoImpl.fetchContacts();
-    for (var eachContact in contacts) {
-      print(eachContact.groupId);
-    }
     final filteredContactList =
         contacts
             .where((eachContact) => eachContact.groupId == event.groupId)
@@ -63,7 +60,6 @@ class AddExpenseBloc extends Bloc<AddExpenseInitialEvent, AddExpenseState> {
       ),
     );
 
-    print(filteredContactList);
     emit(
       state.copyWith(
         contactStatus: FetchContactsStatus.success,

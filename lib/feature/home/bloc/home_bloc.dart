@@ -29,8 +29,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     );
     final groupList = await repositoryImpl.fetchGroups();
     final name = await repositoryImpl.getName();
-    print("name : $name");
-    print("groupList : $groupList");
 
     emit(
       state.copyWith(

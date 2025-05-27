@@ -108,7 +108,6 @@ class ExpenseDetailsScreen extends StatelessWidget {
       itemCount: expenseListModel.length,
       itemBuilder: (_, index) {
         final eachExpense = expenseListModel[index];
-        print(eachExpense.expenseName);
         return _eachExpenseDetails(eachExpense, context);
       },
     );

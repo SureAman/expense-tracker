@@ -10,7 +10,7 @@ class HomeRepositoryImpl extends HomeRepository {
   @override
   Future<List<GroupModel>> fetchGroups() async {
     List<GroupModel> model = [];
-    await Future.delayed(Duration(seconds: 3), () async {
+    await Future.delayed(const Duration(seconds: 3), () async {
       model = await SharedPreferencesManager.getGroups();
     });
     return model;

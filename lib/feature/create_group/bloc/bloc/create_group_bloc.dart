@@ -51,8 +51,6 @@ class CreateGroupBloc extends Bloc<CreateGroupEvent, CreateGroupState> {
     }
     final memberCount = contactModels.length;
 
-    print("models $contactModels");
-    print("Member Count : ${memberCount + 1}");
     final GroupModel groupModel = GroupModel(
       id: id,
       name: event.groupName,

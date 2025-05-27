@@ -162,10 +162,7 @@ class _SignUpScreenState extends State<SignUpScreen> with ValidationUtils {
                   number: _numberController.text,
                 ),
               );
-              print("Called");
-            } else {
-              print("Error");
-            }
+            } else {}
           },
         ),
       ],
