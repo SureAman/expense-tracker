@@ -1,5 +1,9 @@
 import 'package:expense_tracker/core/models/contacts_model.dart';
+import 'package:json_annotation/json_annotation.dart';
 
+part 'expense_model.g.dart';
+
+@JsonSerializable()
 class ExpenseModel {
   final String expenseName;
   final String id;
@@ -31,30 +35,35 @@ class ExpenseModel {
     );
   }
 
-  factory ExpenseModel.fromMap(Map<String, dynamic> map) {
-    return ExpenseModel(
-      expenseName: map['expenseName'],
-      id: map['id'],
-      expenseAmount: map['expenseAmount'],
-      groupId: map['groupId'],
-      contactModel:
-          map['contactModel'] != null
-              ? List<ContactsModel>.from(
-                (map['contactModel'] as List).map(
-                  (e) => ContactsModel.fromMap(e),
-                ),
-              )
-              : null,
-    );
-  }
+  // factory ExpenseModel.fromMap(Map<String, dynamic> map) {
+  //   return ExpenseModel(
+  //     expenseName: map['expenseName'],
+  //     id: map['id'],
+  //     expenseAmount: map['expenseAmount'],
+  //     groupId: map['groupId'],
+  //     contactModel:
+  //         map['contactModel'] != null
+  //             ? List<ContactsModel>.from(
+  //               (map['contactModel'] as List).map(
+  //                 (e) => ContactsModel.fromMap(e),
+  //               ),
+  //             )
+  //             : null,
+  //   );
+  // }
 
-  Map<String, dynamic> toMap() {
-    return {
-      'expenseName': expenseName,
-      'id': id,
-      'expenseAmount': expenseAmount,
-      'groupId': groupId,
-      'contactModel': contactModel?.map((e) => e.toMap()).toList(),
-    };
-  }
+  factory ExpenseModel.fromMap(Map<String, dynamic> map) =>
+      _$ExpenseModelFromJson(map);
+
+  // Map<String, dynamic> toMap() {
+  //   return {
+  //     'expenseName': expenseName,
+  //     'id': id,
+  //     'expenseAmount': expenseAmount,
+  //     'groupId': groupId,
+  //     'contactModel': contactModel?.map((e) => e.toMap()).toList(),
+  //   };
+  // }
+
+  Map<String, dynamic> toMap() => _$ExpenseModelToJson(this);
 }

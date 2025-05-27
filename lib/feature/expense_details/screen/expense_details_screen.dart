@@ -83,7 +83,6 @@ class ExpenseDetailsScreen extends StatelessWidget {
           return const Center(child: CircularProgressIndicator());
         } else if (state.status == ExpenseDetailsStatus.loaded) {
           final expenseListModel = state.model;
-          print(expenseListModel);
           if (expenseListModel.isEmpty) {
             return Center(
               child: Text(

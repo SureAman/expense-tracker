@@ -8,6 +8,9 @@ class NameConstants {
   static const String enterName = "Enter Name";
   static const String enterPhone = "Enter Phone";
   static const String enterAmount = "Enter Amount";
+  static const String selectContacts = "Select Contacts";
+  static const String noDataAvailable = "No Data Availaible";
+  static const String complete = "Complete";
   static const String create = 'Create';
   static const String add = "Add";
   static const String home = "Home";
@@ -25,4 +28,8 @@ class NameConstants {
   static const String nameCannotBeEmpty = "Name cannot be empty";
   static const String enterValidNumber = "Please enter a vaid number.";
   static const String numberCannotBeEmpty = "Number cannot be empty!";
+  static const String valueCannotBeEmpty = "Value cannot be empty";
+  static const String pleaseEnterAmount = "Please enter amount";
+  static const String groupCreatedSuccessfully = "Group created successfully";
+  static const String noGroupCreatedCreateOne = "No group found create one..";
 }

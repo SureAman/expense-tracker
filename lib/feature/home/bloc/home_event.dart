@@ -1,5 +1,3 @@
-import 'package:expense_tracker/core/models/contacts_model.dart';
-
 abstract class HomeEvent {}
 
 class FetchInitialData extends HomeEvent {}

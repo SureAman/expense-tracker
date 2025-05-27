@@ -1,7 +1,6 @@
 import 'package:expense_tracker/core/constants/icons.dart';
 import 'package:expense_tracker/core/constants/names.dart';
 import 'package:expense_tracker/core/utils/validation_utils.dart';
-import 'package:expense_tracker/core/widgets/common_elevated_button.dart';
 import 'package:expense_tracker/core/widgets/common_text_form_field.dart';
 import 'package:flutter/material.dart';
 
@@ -48,10 +47,10 @@ class _AddExpenseFormState extends State<AddExpenseForm> with ValidationUtils {
                   validator: (value) {
                     if (value != null) {
                       if (value.isEmpty) {
-                        return 'Value Cannot be empty';
+                        return NameConstants.valueCannotBeEmpty;
                       }
                     } else {
-                      return "Please enter amount";
+                      return NameConstants.pleaseEnterAmount;
                     }
                     return null;
                   },

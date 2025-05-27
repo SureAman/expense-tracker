@@ -1,4 +1,5 @@
 import 'package:expense_tracker/core/constants/icons.dart';
+import 'package:expense_tracker/core/constants/names.dart';
 import 'package:expense_tracker/core/models/contacts_model.dart';
 import 'package:expense_tracker/core/models/expense_model.dart';
 import 'package:expense_tracker/core/styles/text_styles.dart';
@@ -60,7 +61,7 @@ class CommonModalBottomSheet extends StatelessWidget {
             final contacts = state.model;
             final selectedIndices = state.selectedIndices;
             if (contacts.isEmpty) {
-              return const Center(child: Text("No contacts available"));
+              return const Center(child: Text(NameConstants.noDataAvailable));
             }
             return Padding(
               padding: const EdgeInsets.only(top: 24),
@@ -68,7 +69,7 @@ class CommonModalBottomSheet extends StatelessWidget {
                 children: [
                   Expanded(child: _contactWidget(contacts, selectedIndices)),
                   CommonElevatedButton(
-                    buttonText: "Complete",
+                    buttonText: NameConstants.complete,
                     onPressed: () {
                       context.read<AddExpenseBloc>().add(
                         AddExpenseEvent(
@@ -86,7 +87,7 @@ class CommonModalBottomSheet extends StatelessWidget {
           }
           return const SizedBox(
             height: 100,
-            child: Center(child: Text('No Data available')),
+            child: Center(child: Text(NameConstants.noDataAvailable)),
           );
         },
       ),

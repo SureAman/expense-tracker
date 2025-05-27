@@ -19,3 +19,5 @@ class SelectedContactEvent extends CreateGroupEvent {
 }
 
 class FetchContactEvent extends CreateGroupEvent {}
+
+class ResetSelectedIndices extends CreateGroupEvent {}

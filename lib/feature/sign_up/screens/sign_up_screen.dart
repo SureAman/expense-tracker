@@ -1,11 +1,11 @@
 import 'package:expense_tracker/core/constants/icons.dart';
 import 'package:expense_tracker/core/constants/names.dart';
-import 'package:expense_tracker/core/route/app_routes.dart';
 import 'package:expense_tracker/core/route/route_names.dart';
 import 'package:expense_tracker/core/styles/text_styles.dart';
 import 'package:expense_tracker/core/utils/validation_utils.dart';
 import 'package:expense_tracker/core/widgets/common_app_bar.dart';
 import 'package:expense_tracker/core/widgets/common_elevated_button.dart';
+import 'package:expense_tracker/core/widgets/common_scaffold_messanger.dart';
 import 'package:expense_tracker/core/widgets/common_text_form_field.dart';
 import 'package:expense_tracker/feature/sign_up/bloc/signup_bloc.dart';
 import 'package:expense_tracker/feature/sign_up/bloc/signup_event.dart';
@@ -43,35 +43,55 @@ class _SignUpScreenState extends State<SignUpScreen> with ValidationUtils {
         isCenterTitle: true,
       ),
       resizeToAvoidBottomInset: true,
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        padding: const EdgeInsets.symmetric(horizontal: 24),
-        child: Stack(
-          children: [
-            _buildForm(),
-            _circularProgressIndicator(),
-            _navigateToNewScreen(),
-          ],
-        ),
+      body: BlocConsumer<SignupBloc, SignupState>(
+        listenWhen:
+            (previous, current) =>
+                previous.isSubmittedSuccessfully !=
+                current.isSubmittedSuccessfully,
+        listener: (context, state) {
+          if (state.isSubmittedSuccessfully) {
+            CommonScaffoldMessenger.show(
+              context: context,
+              message: "Details saved successfully",
+              errorType: ErrorType.success,
+            );
+            Navigator.pushReplacementNamed(context, RouteNames.home);
+          }
+        },
+        builder: (context, state) {
+          if (state.isLoading) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          return Container(
+            width: double.infinity,
+            height: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            child: Stack(
+              children: [
+                _buildForm(),
+                //_navigateToNewScreen(),
+              ],
+            ),
+          );
+        },
       ),
     );
   }
 
-  BlocListener<SignupBloc, SignupState> _navigateToNewScreen() {
-    return BlocListener<SignupBloc, SignupState>(
-      listenWhen:
-          (previous, current) =>
-              previous.isSubmittedSuccessfully !=
-              current.isSubmittedSuccessfully,
-      listener: (context, state) {
-        if (state.isSubmittedSuccessfully) {
-          Navigator.pushReplacementNamed(context, RouteNames.home);
-        }
-      },
-      child: const SizedBox.shrink(),
-    );
-  }
+  // BlocListener<SignupBloc, SignupState> _navigateToNewScreen() {
+  //   return BlocListener<SignupBloc, SignupState>(
+  //     listenWhen:
+  //         (previous, current) =>
+  //             previous.isSubmittedSuccessfully !=
+  //             current.isSubmittedSuccessfully,
+  //     listener: (context, state) {
+  //       if (state.isSubmittedSuccessfully) {
+  //         Navigator.pushReplacementNamed(context, RouteNames.home);
+  //       }
+  //     },
+  //     child: const SizedBox.shrink(),
+  //   );
+  // }
 
   Widget _buildForm() {
     return Form(
@@ -149,17 +169,6 @@ class _SignUpScreenState extends State<SignUpScreen> with ValidationUtils {
           },
         ),
       ],
-    );
-  }
-
-  Widget _circularProgressIndicator() {
-    return BlocBuilder<SignupBloc, SignupState>(
-      //buildWhen: (previous, current) => previous.isLoading != current.isLoading,
-      builder: (context, state) {
-        return state.isLoading
-            ? const Center(child: CircularProgressIndicator())
-            : const SizedBox.shrink();
-      },
     );
   }
 }

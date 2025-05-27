@@ -2,6 +2,7 @@ import 'package:expense_tracker/core/constants/icons.dart';
 import 'package:expense_tracker/core/constants/names.dart';
 import 'package:expense_tracker/core/widgets/common_app_bar.dart';
 import 'package:expense_tracker/core/widgets/common_elevated_button.dart';
+import 'package:expense_tracker/core/widgets/common_scaffold_messanger.dart';
 import 'package:expense_tracker/core/widgets/common_text_form_field.dart';
 import 'package:expense_tracker/feature/create_group/bloc/bloc/create_group_bloc.dart';
 import 'package:expense_tracker/feature/create_group/widgets/contact_list_details.dart';
@@ -31,6 +32,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
   void dispose() {
     _groupNameCotroller.dispose();
     _state.currentState?.dispose();
+
     super.dispose();
   }
 
@@ -58,7 +60,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
       buildWhen:
           (previous, current) =>
               current.status == CreateGroupStatus.loading ||
-              current.status == CreateGroupStatus.loaded,
+              current.status == CreateGroupStatus.success,
       builder: (context, state) {
         if (state.status == CreateGroupStatus.loading) {
           return const Center(child: CircularProgressIndicator());
@@ -68,10 +70,17 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
       listenWhen: (previous, current) => previous.status != current.status,
       listener: (_, state) {
         if (state.status == CreateGroupStatus.error) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text(NameConstants.pleaseSelectContact)),
+          CommonScaffoldMessenger.show(
+            context: context,
+            message: NameConstants.pleaseSelectContact,
+            errorType: ErrorType.warning,
           );
-        } else if (state.status == CreateGroupStatus.loaded) {
+        } else if (state.status == CreateGroupStatus.success) {
+          CommonScaffoldMessenger.show(
+            context: context,
+            message: NameConstants.groupCreatedSuccessfully,
+            errorType: ErrorType.success,
+          );
           Navigator.pop(context, true);
         }
       },

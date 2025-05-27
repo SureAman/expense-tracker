@@ -1,18 +1,25 @@
 import 'dart:async';
 
 import 'package:equatable/equatable.dart';
-import 'package:expense_tracker/core/database/shared_preferences_manager.dart';
+import 'package:expense_tracker/core/dependencies/dependencies.dart';
 import 'package:expense_tracker/core/models/contacts_model.dart';
 import 'package:expense_tracker/core/models/expense_model.dart';
+import 'package:expense_tracker/feature/add_expense/repository/add_expense_repository.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 part 'add_expense_event.dart';
 part 'add_expense_state.dart';
 
 class AddExpenseBloc extends Bloc<AddExpenseInitialEvent, AddExpenseState> {
+  final AddExpenseRepositoryImpl addExpenseRepoImpl =
+      getIt<AddExpenseRepositoryImpl>();
+  //final AddExpenseRepository repository;
   AddExpenseBloc() : super(const AddExpenseState()) {
+    //For Adding the expense
     on<AddExpenseEvent>(_addExpenseEvent);
+    //For Fetching the group specific contacts
     on<FetchContactsList>(_fetchContactList);
+    //For Selecting the contacts which are needed to add for the specific expense
     on<SelectedContactEvent>(_selectedContactEvent);
   }
 
@@ -21,15 +28,15 @@ class AddExpenseBloc extends Bloc<AddExpenseInitialEvent, AddExpenseState> {
     Emitter<AddExpenseState> emit,
   ) {
     emit(state.copyWith(status: AddExpenseStatus.loading));
-    final List<ContactsModel> model = [];
+    final List<ContactsModel> contactsModel = [];
     for (var index in state.selectedIndices) {
-      ContactsModel contactsModel = state.model.elementAt(index);
-      model.add(contactsModel);
+      ContactsModel eachContact = state.model.elementAt(index);
+      contactsModel.add(eachContact);
     }
-    print(event.expenseModel.expenseName);
-    SharedPreferencesManager.addExpense(
-      event.expenseModel.copyWith(contactModel: model),
+    ExpenseModel model = event.expenseModel.copyWith(
+      contactModel: contactsModel,
     );
+    addExpenseRepoImpl.addExpenseRepository(model);
     emit(state.copyWith(status: AddExpenseStatus.success));
   }
 
@@ -38,7 +45,7 @@ class AddExpenseBloc extends Bloc<AddExpenseInitialEvent, AddExpenseState> {
     Emitter<AddExpenseState> emit,
   ) async {
     emit(state.copyWith(contactStatus: FetchContactsStatus.loading));
-    final contacts = await SharedPreferencesManager.getContacts();
+    final contacts = await addExpenseRepoImpl.fetchContacts();
     for (var eachContact in contacts) {
       print(eachContact.groupId);
     }

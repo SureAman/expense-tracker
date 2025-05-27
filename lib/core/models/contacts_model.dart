@@ -1,3 +1,8 @@
+import 'package:json_annotation/json_annotation.dart';
+
+part 'contacts_model.g.dart';
+
+@JsonSerializable()
 class ContactsModel {
   final String contactName;
   final List<String> contactNumber;
@@ -10,21 +15,9 @@ class ContactsModel {
     this.groupId,
     required this.contactId,
   });
-  factory ContactsModel.fromMap(Map<String, dynamic> map) {
-    return ContactsModel(
-      contactName: map['contactName'],
-      contactId: map['contactId'],
-      contactNumber: List<String>.from(map['contactNumber']),
-      groupId: map['groupId'],
-    );
-  }
 
-  Map<String, dynamic> toMap() {
-    return {
-      'contactName': contactName,
-      'contactId': contactId,
-      'contactNumber': contactNumber,
-      'groupId': groupId,
-    };
-  }
+  factory ContactsModel.fromMap(Map<String, dynamic> map) =>
+      _$ContactsModelFromJson(map);
+
+  Map<String, dynamic> toMap() => _$ContactsModelToJson(this);
 }

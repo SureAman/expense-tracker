@@ -9,6 +9,8 @@
 # packages, and plugins designed to encourage good coding practices.
 include: package:flutter_lints/flutter.yaml
 analyzer:
+  plugins:
+    - bloc_lint
   errors:
     # Warn about missing 'const' constructors
     missing_const_in_initializer: warning

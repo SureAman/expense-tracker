@@ -5,6 +5,7 @@ import 'package:expense_tracker/core/route/route_names.dart';
 import 'package:expense_tracker/core/styles/text_styles.dart';
 import 'package:expense_tracker/core/widgets/common_app_bar.dart';
 import 'package:expense_tracker/core/widgets/common_elevated_button.dart';
+import 'package:expense_tracker/feature/create_group/bloc/bloc/create_group_bloc.dart';
 import 'package:expense_tracker/feature/home/bloc/home_bloc.dart';
 import 'package:expense_tracker/feature/home/bloc/home_event.dart';
 import 'package:expense_tracker/feature/home/bloc/home_state.dart';
@@ -73,7 +74,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ? _groupList(state.groupModel)
                   : Center(
                     child: Text(
-                      "No group found create one..",
+                      NameConstants.noGroupCreatedCreateOne,
                       style: CommonTextStyles.semiBoldTextStyle(),
                     ),
                   ),
@@ -105,6 +106,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _elevatedButton(BuildContext context) {
     return CommonElevatedButton(
       onPressed: () async {
+        context.read<CreateGroupBloc>().add(ResetSelectedIndices());
         final isAdded =
             await Navigator.pushNamed(
               context,

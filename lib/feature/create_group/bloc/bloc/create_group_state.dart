@@ -23,7 +23,7 @@ part of 'create_group_bloc.dart';
 //   ContactsState({required this.contacts, required this.isPermissionDenied});
 // }
 
-enum CreateGroupStatus { initial, loading, loaded, error }
+enum CreateGroupStatus { initial, loading, success, error }
 
 class CreateGroupState extends Equatable {
   final CreateGroupStatus status;

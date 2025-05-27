@@ -1,9 +1,16 @@
+import 'package:expense_tracker/core/dependencies/dependencies.dart';
 import 'package:expense_tracker/core/route/app_routes.dart';
 import 'package:expense_tracker/core/route/route_names.dart';
+import 'package:expense_tracker/feature/create_group/bloc/bloc/create_group_bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 void main() {
-  runApp(const MyApp());
+  WidgetsFlutterBinding.ensureInitialized();
+  setupDependencies();
+  runApp(
+    BlocProvider(create: (context) => CreateGroupBloc(), child: const MyApp()),
+  );
 }
 
 class MyApp extends StatelessWidget {

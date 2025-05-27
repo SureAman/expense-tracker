@@ -6,6 +6,7 @@ import 'package:expense_tracker/core/styles/text_styles.dart';
 import 'package:expense_tracker/core/utils/validation_utils.dart';
 import 'package:expense_tracker/core/widgets/common_app_bar.dart';
 import 'package:expense_tracker/core/widgets/common_elevated_button.dart';
+import 'package:expense_tracker/core/widgets/common_scaffold_messanger.dart';
 import 'package:expense_tracker/feature/add_expense/bloc/add_expense_bloc.dart';
 import 'package:expense_tracker/feature/add_expense/widgets/add_expense_form.dart';
 import 'package:flutter/material.dart';
@@ -61,7 +62,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen>
       ),
       const SizedBox(height: 24),
       CommonElevatedButton(
-        buttonText: "Select Contacts",
+        buttonText: NameConstants.selectContacts,
         onPressed: () {
           if (_formkey.currentState!.validate()) {
             _modalBottomSheet(
@@ -101,6 +102,11 @@ class _AddExpenseScreenState extends State<AddExpenseScreen>
     child: BlocConsumer<AddExpenseBloc, AddExpenseState>(
       listener: (context, state) {
         if (state.status == AddExpenseStatus.success) {
+          CommonScaffoldMessenger.show(
+            context: context,
+            message: "Expense Added Successfully",
+            errorType: ErrorType.success,
+          );
           Navigator.pop(context);
           Future.microtask(() => Navigator.of(addExpenseContext).pop(true));
         }
@@ -120,7 +126,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen>
         }
         return const SizedBox(
           height: 100,
-          child: Center(child: Text('No Data available')),
+          child: Center(child: Text(NameConstants.noDataAvailable)),
         );
       },
     ),
@@ -136,7 +142,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen>
       children: [
         Expanded(child: _contactWidget(contacts, selectedIndices)),
         CommonElevatedButton(
-          buttonText: "Complete",
+          buttonText: NameConstants.complete,
           onPressed: () {
             context.read<AddExpenseBloc>().add(
               AddExpenseEvent(
